@@ -1,8 +1,6 @@
 import numpy as np
 
 # Neural Network Model for Image Classification
-# Forward: passes data through the network to get predictions.
-# Backward: updates weights and biases based on the error of predictions.
 class NeuralNetwork:
     def __init__(self, layers):
         # Example layers: [64*64*3, 128, 2]
@@ -13,16 +11,17 @@ class NeuralNetwork:
         # So this neural network has 3 layers:
         # 1. Input layer with 64*64*3 neurons (for each pixel in a 64x64 RGB image)
         # 2. Hidden layer with 128 neurons
-        # 3. Output layer with 2 neurons (for the two classes)
+        # 3. Output layer with 1 neuron
         self.layers = layers
-        self.weights = [np.random.rand(layers[i], layers[i+1]) for i in range(len(layers)-1)]
-        self.biases = [np.random.rand(1, layers[i+1]) for i in range(len(layers)-1)]
+        self.weights = [np.random.randn(layers[i], layers[i+1]) * np.sqrt(2 / layers[i]) for i in range(len(layers) - 1)]
+        self.biases = [np.zeros((1, layers[i+1]))for i in range(len(layers)-1)]
 
-        print("Neural Network initialized with layers:", self.layers)
+        print("Neural Network initialized with layers: ", self.layers)
  
+    # TODO: move activation/derivative functions to a separate file and use based on input
     def sigmoid_activation(self, x):
-            z = np.clip(z, -500, 500)  # clip values to prevent overflow
-            return 1 / (1 + np.exp(-z))
+            x = np.clip(x, -500, 500)  # clip values to prevent overflow
+            return 1 / (1 + np.exp(-x))
     
     def sigmoid_derivative(self, X):
         s = self.sigmoid_activation(X)
@@ -44,7 +43,7 @@ class NeuralNetwork:
     def tanh(self, x):
         return np.tanh(x)
     
-    def tahn_derivative(self, x):
+    def tanh_derivative(self, x):
         t = self.tanh(x)
         return 1 - t**2
     
@@ -55,48 +54,55 @@ class NeuralNetwork:
     # Computes the output of the network for input X
     # by passing it through the layers
     def forward(self, X):
-        a = [X]
-        z = []
+        self.a = [X] # activations
+        self.z = [] # pre-activations
         for i in range(len(self.layers)-1):
-            zi = np.dot(a[i], self.weights[i]) + self.biases[i]
-            ai = self.sigmoid_activation(zi)
-            z.append(zi)
-            a.append(ai)
-        return a, z
+            zi = np.dot(self.a[i], self.weights[i]) + self.biases[i]
+            self.z.append(zi)
+            # ai = self.sigmoid_activation(zi)
+            if i == len(self.layers) - 2:  # last layer
+                ai = self.sigmoid_activation(zi) # sigmoid for binary classification
+            else:
+                ai = self.relu(zi) # use ReLU for hidden layers
+            self.a.append(ai)
+        return self.a, self.z
     
     # Updates the weights and biases using backpropagation using gradient descent
     # based on the error between predicted and actual output
     def backward(self, X, y, learning_rate=0.01):
-         a, z = self.forward(X)
          m = X.shape[0]
-         delta = a[-1] - y  # assumes sigmoid + BCE
+         assert self.a[-1].shape == y.shape, f"Shape mismatch: y_pred={self.a[-1].shape}, y={y.shape}"
+
+         # For binary classification, we can use sigmoid activation and binary cross-entropy loss
+         delta = self.a[-1] - y  # assumes sigmoid + BCE 
          for i in reversed(range(len(self.layers) - 1)):
-            grad_w = np.dot(a[i].T, delta) / m
+            grad_w = np.dot(self.a[i].T, delta) / m
             grad_b = np.sum(delta, axis=0, keepdims=True) / m
             self.weights[i] -= learning_rate * grad_w
             self.biases[i] -= learning_rate * grad_b
             if i > 0:
-                delta = np.dot(delta, self.weights[i].T) * self.sigmoid_derivative(z[i - 1])
-    
-    def train(self, X, y, epochs=1000, learning_rate=0.01):
-        for epoch in range(epochs):
-            self.forward(X)
-            self.backward(X, y, learning_rate)
-            if epoch % 100 == 0:
-                loss = np.mean(np.square(y - self.a[-1]))
-                print(f'Epoch {epoch}, Loss: {loss}')
+                delta = np.dot(delta, self.weights[i].T) * self.relu_derivative(self.z[i - 1])
 
     def predict(self, X):
-        a, _ = self.forward(X)
-        return (a[-1] > 0.5).astype(int)
+        self.forward(X)
+        return (self.a[-1] > 0.5).astype(int)
     
     def save(self, path):
-        np.savez(path, weights=self.weights, biases=self.biases)
+        # Ensure all biases are 2D arrays with shape (1, N)
+        biases_fixed = [b.reshape(1, -1) if b.ndim == 1 else b for b in self.biases]    
+        # a = np.random.rand(1, 128)
+        # b = np.random.rand(1, 2)
+        # biases = [a, b]
+        # TODO: still gives ValueError: could not broadcast input array from shape (128,) into shape (1,)
+        try:
+            np.savez(path, weights=np.array(self.weights, dtype=object), biases=np.array(biases_fixed, dtype=object))
+        except Exception as e:
+            print(f"Couldn't save the model due to error: {e}")
     
     def load(self, path):
         data = np.load(path, allow_pickle=True)
         self.weights = list(data['weights'])
-        self.biases = list(data['biases'])
+        self.biases = [b.reshape(1, -1) if b.ndim == 1 else b for b in list(data['biases'])]
         print(f"Model loaded from {path} with weights and biases.")
 
 

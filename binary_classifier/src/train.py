@@ -1,8 +1,8 @@
-from image_classifier.src.model import NeuralNetwork
+from binary_classifier.src.model import NeuralNetwork
 import numpy as np
 import os
 
-def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.01):
+def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.1):
     """
     Train the neural network model using the provided data.
     
@@ -17,9 +17,29 @@ def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.01):
         model.forward(X)
         model.backward(X, y, learning_rate)
         # if epoch % 100 == 0:
-        loss = np.mean(np.square(y - model.a[-1]))
-        print(f'Epoch {epoch}, Loss: {loss}')
+        acc = accuracy(y, model.a[-1])
+        loss = binary_cross_entropy(y, model.a[-1])
+        preds = model.a[-1]
+        print(f'Epoch {epoch}, Loss: {loss}, Pred Mean: {preds.mean():.4f}, Min: {preds.min():.4f}, Max: {preds.max():.4f}, Acc: {acc}')
     
+def binary_cross_entropy(y_true, y_pred):
+    """
+    Compute the binary cross-entropy loss.
+    
+    Parameters:
+    - y_true: True labels (one-hot encoded).
+    - y_pred: Predicted probabilities from the model.
+    
+    Returns:
+    - loss: The computed binary cross-entropy loss.
+    """
+    epsilon = 1e-8
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+def accuracy(y_true, y_pred, threshold=0.5):
+    preds = (y_pred > threshold).astype(int)
+    return np.mean(preds == y_true)
 
 def evaluate(model: NeuralNetwork, X, y):
     """
@@ -34,6 +54,8 @@ def evaluate(model: NeuralNetwork, X, y):
     - accuracy: The accuracy of the model on the provided data.
     """
     predictions = model.predict(X)
+    print("First 5 predictions:", model.a[-1][:5].T)
+    print("First 5 labels     :", y[:5].T)
     predicted_classes = np.argmax(predictions, axis=1)
     true_classes = np.argmax(y, axis=1)
     accuracy = np.mean(predicted_classes == true_classes)
@@ -69,5 +91,5 @@ def predict_random_image(model: NeuralNetwork, image_dir, labels, image_size=(64
     prediction = model.predict(img_array)
     predicted_label = labels[np.argmax(prediction)]
     
-    print(f'Predicted label for {filename}: {predicted_label}')
+    print(f'Predicted label for {folder}.{filename}: {predicted_label}')
     return predicted_label

@@ -1,29 +1,36 @@
-from image_classifier.src.model import NeuralNetwork
-from image_classifier.src.utils import load_data, split_data, one_hot_encode
-from image_classifier.src.train import train, evaluate, predict_random_image
+from binary_classifier.src.model import NeuralNetwork
+from binary_classifier.src.utils import load_data, split_data, one_hot_encode
+from binary_classifier.src.train import train, evaluate, predict_random_image
 import argparse
 
 def main(args):    
-    model = NeuralNetwork(layers=[64*64*3, 128, 2])
-    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), max_images=25000, normalize_image=True)
+    model = NeuralNetwork(layers=[64*64*3, 128, 1]) # 1 output neuron for binary classification (Cat vs Dog)
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True)
 
     if args.load_model:
         model.load(args.load_model)
         print(f"Model loaded from {args.load_model}")
         if args.predict_random_image:
             predict_random_image(model, 'PetImages', ['Cat', 'Dog'], image_size=(64, 64))
+            return
 
     # Split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_data(data, labels)
-    y_train = one_hot_encode(y_train, num_classes=2)
-    y_test = one_hot_encode(y_test, num_classes=2)
+    y_train = y_train.reshape(-1, 1)
+    y_test = y_test.reshape(-1, 1)
+    # print(y_train)
+    # y_train = one_hot_encode(y_train, num_classes=2)
+    # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
 
     if not args.load_model:
         train(model, X_train, y_train, epochs=100, learning_rate=0.01)
         if args.save_model:
-            model.save(args.save_model)
+            model.save(args.save_model)\
 
     evaluate(model, X_test, y_test)
+    print("\n\n ----------------------------------- \n\n")
+    for _ in range(10):
+        predict_random_image(model, 'PetImages', ['Cat', 'Dog'], image_size=(64, 64))
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train a Neural Network for Image Classification')
