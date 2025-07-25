@@ -1,4 +1,4 @@
-# nn-image-classification
+# nn
 
 This project implements a neural network from scratch for image classification tasks. The neural network is designed to learn from image data and make predictions based on the learned patterns.
 
