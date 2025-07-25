@@ -1,6 +1,6 @@
-from binary_classifier.src.model import NeuralNetwork
-from binary_classifier.src.utils import load_data, split_data, one_hot_encode
-from binary_classifier.src.train import train, evaluate, predict_random_image
+from binary.src.model import NeuralNetwork
+from binary.src.utils import load_data, split_data, one_hot_encode
+from binary.src.train import train, evaluate, predict_random_image
 import argparse
 
 def main(args):    

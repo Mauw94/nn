@@ -5,7 +5,7 @@ This project implements a neural network from scratch for image classification t
 ## Project Structure
 
 ```
-nn-image-classification/
+binary/
 ├── src/
 │   ├── main.py          # Entry point of the application
 │   ├── model.py         # Defines the neural network architecture
@@ -22,7 +22,7 @@ nn-image-classification/
 1. Clone the repository:
    ```
    git clone <repository-url>
-   cd nn-image-classification
+   cd nn
    ```
 
 2. Install the required dependencies:

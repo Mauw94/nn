@@ -1,4 +1,4 @@
-from binary_classifier.src.model import NeuralNetwork
+from binary.src.model import NeuralNetwork
 import numpy as np
 import os
 
@@ -27,7 +27,7 @@ def binary_cross_entropy(y_true, y_pred):
     Compute the binary cross-entropy loss.
     
     Parameters:
-    - y_true: True labels (one-hot encoded).
+    - y_true: True labels (not hot encoded since this is a binary nn)
     - y_pred: Predicted probabilities from the model.
     
     Returns:
