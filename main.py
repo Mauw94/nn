@@ -1,0 +1,36 @@
+from image_classifier.src.model import NeuralNetwork
+from image_classifier.src.utils import load_data, split_data, one_hot_encode
+from image_classifier.src.train import train, evaluate, predict_random_image
+import argparse
+
+def main(args):    
+    model = NeuralNetwork(layers=[64*64*3, 128, 2])
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), max_images=25000, normalize_image=True)
+
+    if args.load_model:
+        model.load(args.load_model)
+        print(f"Model loaded from {args.load_model}")
+        if args.predict_random_image:
+            predict_random_image(model, 'PetImages', ['Cat', 'Dog'], image_size=(64, 64))
+
+    # Split the data into training and testing sets
+    X_train, y_train, X_test, y_test = split_data(data, labels)
+    y_train = one_hot_encode(y_train, num_classes=2)
+    y_test = one_hot_encode(y_test, num_classes=2)
+
+    if not args.load_model:
+        train(model, X_train, y_train, epochs=100, learning_rate=0.01)
+        if args.save_model:
+            model.save(args.save_model)
+
+    evaluate(model, X_test, y_test)
+    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Train a Neural Network for Image Classification')
+    parser.add_argument('--epochs', type=int, default=1000, help='Number of training epochs')
+    parser.add_argument('--learning_rate', type=float, default=0.01, help='Learning rate for training')
+    parser.add_argument('--save-model', type=str, default='model.npz', help='Path to save the trained model')
+    parser.add_argument('--load-model', type=str, default=None, help='Path to load a pre-trained model')
+    parser.add_argument('--predict-random-image', action='store_true', help='Predict a random image from the dataset')
+    args = parser.parse_args()
+    main(args)

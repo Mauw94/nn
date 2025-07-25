@@ -1,0 +1,16 @@
+PetImages
+virtualenv
+*.pyc
+__pycache__
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.csv
+*.h5
+*.npz
+*.npy
+*.pt
+*.pth
+*.ckpt
