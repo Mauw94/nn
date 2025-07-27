@@ -15,7 +15,7 @@ def main(args):
             return
 
     # Split the data into training and testing sets
-    X_train, y_train, X_test, y_test = split_data(data, labels)
+    X_train, y_train, X_test, y_test = split_data(data, labels, seed=42)
     y_train = y_train.reshape(-1, 1)
     y_test = y_test.reshape(-1, 1)
     # print(y_train)
@@ -23,7 +23,7 @@ def main(args):
     # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
 
     if not args.load_model:
-        train(model, X_train, y_train, epochs=100, learning_rate=0.01)
+        train(model, X_train, y_train, epochs=1000, learning_rate=0.01)
         if args.save_model:
             model.save(args.save_model)\
 

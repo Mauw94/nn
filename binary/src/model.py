@@ -83,9 +83,13 @@ class NeuralNetwork:
             if i > 0:
                 delta = np.dot(delta, self.weights[i].T) * self.relu_derivative(self.z[i - 1])
 
+    def predict_proba(self, X):
+        a, _ = self.forward(X)
+        return a[-1]
+    
     def predict(self, X):
-        self.forward(X)
-        return (self.a[-1] > 0.5).astype(int)
+        proba = self.predict_proba(X)
+        return (proba > 0.5).astype(int)
     
     def save(self, path):
         # Ensure all biases are 2D arrays with shape (1, N)

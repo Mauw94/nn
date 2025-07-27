@@ -43,14 +43,21 @@ def preprocess_data(data):
     """
     return data / 255.0 if isinstance(data, np.ndarray) else np.array(data) / 255.0
 
-def split_data(data, labels, train_size=0.8):
+def split_data(data, labels, train_size=0.8, seed=None):
     """
     Split the data into training and testing sets.
     """
-    #TODO: needs to be randomized because rn the data is loaded so as cats folder first, then dogs and thus
-    # splitting the data in half, first half is 99%, second half 99% dogs -> overfitting the data
+    if seed is not None:
+        np.random.seed(seed)
+    indices = np.arange(len(data))
+    np.random.shuffle(indices)
+    data_shuffled = data[indices]
+    labels_shuffled = labels[indices]
     split_index = int(len(data) * train_size)
-    return data[:split_index], labels[:split_index], data[split_index:], labels[split_index:]
+    return (
+        data_shuffled[:split_index], labels_shuffled[:split_index],
+        data_shuffled[split_index:], labels_shuffled[split_index:]
+    )
 
 def one_hot_encode(labels, num_classes):
     """

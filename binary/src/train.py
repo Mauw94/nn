@@ -16,11 +16,11 @@ def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.1):
     for epoch in range(epochs):
         model.forward(X)
         model.backward(X, y, learning_rate)
-        # if epoch % 100 == 0:
-        acc = accuracy(y, model.a[-1])
-        loss = binary_cross_entropy(y, model.a[-1])
-        preds = model.a[-1]
-        print(f'Epoch {epoch}, Loss: {loss}, Pred Mean: {preds.mean():.4f}, Min: {preds.min():.4f}, Max: {preds.max():.4f}, Acc: {acc}')
+        if epoch % 100 == 0:
+            acc = accuracy(y, model.a[-1])
+            loss = binary_cross_entropy(y, model.a[-1])
+            preds = model.a[-1]
+            print(f'Epoch {epoch}, Loss: {loss}, Pred Mean: {preds.mean():.4f}, Min: {preds.min():.4f}, Max: {preds.max():.4f}, Acc: {acc}')
     
 def binary_cross_entropy(y_true, y_pred):
     """
@@ -53,14 +53,14 @@ def evaluate(model: NeuralNetwork, X, y):
     Returns:
     - accuracy: The accuracy of the model on the provided data.
     """
-    predictions = model.predict(X)
-    print("First 5 predictions:", model.a[-1][:5].T)
-    print("First 5 labels     :", y[:5].T)
-    predicted_classes = np.argmax(predictions, axis=1)
-    true_classes = np.argmax(y, axis=1)
-    accuracy = np.mean(predicted_classes == true_classes)
-    print(f'Accuracy: {accuracy * 100:.2f}%')
-    return accuracy
+    prediction = model.predict(X)
+    print(prediction)
+    print("First 10 predictions:", model.a[-1][:10].flatten())
+    print("First 10 true labels     :", y[:10].flatten())
+    print("Correct predictions      :", (prediction[:10].flatten() == y[:10].flatten()))
+    acc = accuracy(y, model.a[-1])
+    print(f'Accuracy: {acc * 100:.2f}%')
+    return acc
 
 def predict_random_image(model: NeuralNetwork, image_dir, labels, image_size=(64, 64)):
     """
@@ -88,8 +88,8 @@ def predict_random_image(model: NeuralNetwork, image_dir, labels, image_size=(64
     img_array = np.array(img).flatten() / 255.0  # Normalize
     img_array = img_array.reshape(1, -1)  # Reshape for prediction
     
-    prediction = model.predict(img_array)
-    predicted_label = labels[np.argmax(prediction)]
-    
-    print(f'Predicted label for {folder}.{filename}: {predicted_label}')
+    prediction = model.predict(img_array)  # shape (1, 1), value 0 or 1
+    predicted_label = labels[int(prediction[0, 0])]
+
+    print(f'Actual label: {folder}, Predicted label for {filename}: {predicted_label}')
     return predicted_label
