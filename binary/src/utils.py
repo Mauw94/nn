@@ -47,6 +47,8 @@ def split_data(data, labels, train_size=0.8):
     """
     Split the data into training and testing sets.
     """
+    #TODO: needs to be randomized because rn the data is loaded so as cats folder first, then dogs and thus
+    # splitting the data in half, first half is 99%, second half 99% dogs -> overfitting the data
     split_index = int(len(data) * train_size)
     return data[:split_index], labels[:split_index], data[split_index:], labels[split_index:]
 
