@@ -70,14 +70,14 @@ class NeuralNetwork:
     # Updates the weights and biases using backpropagation using gradient descent
     # based on the error between predicted and actual output
     def backward(self, X, y, learning_rate=0.01):
-         m = X.shape[0]
          assert self.a[-1].shape == y.shape, f"Shape mismatch: y_pred={self.a[-1].shape}, y={y.shape}"
 
+         m = X.shape[0]
          # For binary classification, we can use sigmoid activation and binary cross-entropy loss
          delta = self.a[-1] - y  # assumes sigmoid + BCE 
          for i in reversed(range(len(self.layers) - 1)):
-            grad_w = np.dot(self.a[i].T, delta) / m
-            grad_b = np.sum(delta, axis=0, keepdims=True) / m
+            grad_w = np.dot(self.a[i].T, delta) / m # gradient of the loss with respect to the weights (how much to change each weight to reduce loss)
+            grad_b = np.sum(delta, axis=0, keepdims=True) / m # gradient of the loss with respect to the biases (how much to change each bias to reduce loss)
             self.weights[i] -= learning_rate * grad_w
             self.biases[i] -= learning_rate * grad_b
             if i > 0:
@@ -92,21 +92,21 @@ class NeuralNetwork:
         return (proba > 0.5).astype(int)
     
     def save(self, path):
-        # Ensure all biases are 2D arrays with shape (1, N)
-        biases_fixed = [b.reshape(1, -1) if b.ndim == 1 else b for b in self.biases]    
-        # a = np.random.rand(1, 128)
-        # b = np.random.rand(1, 2)
-        # biases = [a, b]
-        # TODO: still gives ValueError: could not broadcast input array from shape (128,) into shape (1,)
         try:
-            np.savez(path, weights=np.array(self.weights, dtype=object), biases=np.array(biases_fixed, dtype=object))
+            data = {}
+            for i, (w, b) in enumerate(zip(self.weights, self.biases)):
+                data[f"W{i}"] = w
+                data[f"b{i}"] = b
+            np.savez(path, **data)
         except Exception as e:
             print(f"Couldn't save the model due to error: {e}")
     
     def load(self, path):
-        data = np.load(path, allow_pickle=True)
-        self.weights = list(data['weights'])
-        self.biases = [b.reshape(1, -1) if b.ndim == 1 else b for b in list(data['biases'])]
+        data = np.load(path)
+        print(data)
+        num_layers = len(self.layers) - 1
+        self.weights = [data[f"W{i}"] for i in range(num_layers)]
+        self.biases  = [data[f"b{i}"] for i in range(num_layers)]
         print(f"Model loaded from {path} with weights and biases.")
 
 
