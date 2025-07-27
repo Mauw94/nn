@@ -5,7 +5,6 @@ import argparse
 
 def main(args):    
     model = NeuralNetwork(layers=[64*64*3, 128, 1]) # 1 output neuron for binary classification (Cat vs Dog)
-    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True)
 
     if args.load_model:
         model.load(args.load_model)
@@ -14,11 +13,12 @@ def main(args):
             predict_random_image(model, 'PetImages', ['Cat', 'Dog'], image_size=(64, 64))
             return
 
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=100, image_size=(64, 64), normalize_image=True)
+    
     # Split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_data(data, labels, seed=42)
     y_train = y_train.reshape(-1, 1)
     y_test = y_test.reshape(-1, 1)
-    # print(y_train)
     # y_train = one_hot_encode(y_train, num_classes=2)
     # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
 

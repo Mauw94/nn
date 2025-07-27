@@ -2,7 +2,7 @@ from binary.src.model import NeuralNetwork
 import numpy as np
 import os
 
-def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.1):
+def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.01):
     """
     Train the neural network model using the provided data.
     
@@ -54,7 +54,6 @@ def evaluate(model: NeuralNetwork, X, y):
     - accuracy: The accuracy of the model on the provided data.
     """
     prediction = model.predict(X)
-    print(prediction)
     print("First 10 predictions:", model.a[-1][:10].flatten())
     print("First 10 true labels     :", y[:10].flatten())
     print("Correct predictions      :", (prediction[:10].flatten() == y[:10].flatten()))
@@ -91,5 +90,5 @@ def predict_random_image(model: NeuralNetwork, image_dir, labels, image_size=(64
     prediction = model.predict(img_array)  # shape (1, 1), value 0 or 1
     predicted_label = labels[int(prediction[0, 0])]
 
-    print(f'Actual label: {folder}, Predicted label for {filename}: {predicted_label}')
+    print(f'Actual label: {folder}, Predicted label for {folder}{filename}: {predicted_label}')
     return predicted_label
