@@ -32,7 +32,8 @@ def main(args):
         train(model, X_train, y_train, epochs=1000, learning_rate=0.001)
         if args.save_model:
             model.save(args.save_model)\
-
+    
+    #evaluate(model, X_train, y_train) # check if training set reaches overfitting
     evaluate(model, X_test, y_test)
     # print("\n\n ----------------------------------- \n\n")
     # for _ in range(10):
