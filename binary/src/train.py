@@ -1,8 +1,8 @@
-from binary.src.model import NeuralNetwork
+from binary.src.model import BinaryNeuralNet
 import numpy as np
 import os
 
-def train(model: NeuralNetwork, X, y, epochs=100, learning_rate=0.01):
+def train(model: BinaryNeuralNet, X, y, epochs=100, learning_rate=0.01):
     """
     Train the neural network model using the provided data.
     
@@ -41,7 +41,7 @@ def accuracy(y_true, y_pred, threshold=0.5):
     preds = (y_pred > threshold).astype(int)
     return np.mean(preds == y_true)
 
-def evaluate(model: NeuralNetwork, X, y):
+def evaluate(model: BinaryNeuralNet, X, y):
     """
     Evaluate the model's performance on the provided data.
     
@@ -61,7 +61,7 @@ def evaluate(model: NeuralNetwork, X, y):
     print(f'Accuracy: {acc * 100:.2f}%')
     return acc
 
-def predict_random_image(model: NeuralNetwork, image_dir, labels, image_size=(64, 64)):
+def predict_random_image(model: BinaryNeuralNet, image_dir, labels, image_size=(64, 64)):
     """
     Predict the class of a random image from the specified directory.
     

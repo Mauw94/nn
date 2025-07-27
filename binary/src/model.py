@@ -1,13 +1,14 @@
 import numpy as np
 
-# Neural Network Model for Image Classification
-class NeuralNetwork:
+# Neural Network Model for Binary Classification
+class BinaryNeuralNet:
     def __init__(self, layers):
-        # Example layers: [64*64*3, 128, 2]
+        # Example layers: [64*64*3, 128, 1]
         # where 64*64*3 is the input layer size (for 64x64 RGB images (*3 for RGB channels)),
-        # 128 is a hidden layer size, so the hidden layer has 128 neurons,
-        # and 2 is the output layer size (for 2 classes).
-        # e.g. Classes could be 'Cat' and 'Dog'. Hence, the output layer has 2 neurons.
+        # 128 is a hidden layer size, so the hidden layer has 128 neurons. 
+        # (We can add more hidden layers by extending e.g [64*64*3, 128, 64, 1]) -> We now have 2 hidden layers with 128 and 64 neurons respectively.)
+        # and 1 is the output layer size. This is a binary classifier, so the output can only be 0 or 1.
+        # If we create a different nn where the output are different classes (e.g. Dog, Cat, Hippo, Elephant, ...) we increase the output layer size.
         # So this neural network has 3 layers:
         # 1. Input layer with 64*64*3 neurons (for each pixel in a 64x64 RGB image)
         # 2. Hidden layer with 128 neurons
@@ -16,7 +17,7 @@ class NeuralNetwork:
         self.weights = [np.random.randn(layers[i], layers[i+1]) * np.sqrt(2 / layers[i]) for i in range(len(layers) - 1)]
         self.biases = [np.zeros((1, layers[i+1]))for i in range(len(layers)-1)]
 
-        print("Neural Network initialized with layers: ", self.layers)
+        print("nn initialized with layers: ", self.layers)
  
     # TODO: move activation/derivative functions to a separate file and use based on input
     def sigmoid_activation(self, x):
@@ -59,7 +60,6 @@ class NeuralNetwork:
         for i in range(len(self.layers)-1):
             zi = np.dot(self.a[i], self.weights[i]) + self.biases[i]
             self.z.append(zi)
-            # ai = self.sigmoid_activation(zi)
             if i == len(self.layers) - 2:  # last layer
                 ai = self.sigmoid_activation(zi) # sigmoid for binary classification
             else:
@@ -71,9 +71,8 @@ class NeuralNetwork:
     # based on the error between predicted and actual output
     def backward(self, X, y, learning_rate=0.01):
          assert self.a[-1].shape == y.shape, f"Shape mismatch: y_pred={self.a[-1].shape}, y={y.shape}"
-
          m = X.shape[0]
-         # For binary classification, we can use sigmoid activation and binary cross-entropy loss
+         # For binary classification, we can use sigmoid activation and binary cross-entropy loss (see train.py)
          delta = self.a[-1] - y  # assumes sigmoid + BCE 
          for i in reversed(range(len(self.layers) - 1)):
             grad_w = np.dot(self.a[i].T, delta) / m # gradient of the loss with respect to the weights (how much to change each weight to reduce loss)
