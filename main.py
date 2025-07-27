@@ -1,6 +1,6 @@
 from binary.src.model import BinaryNeuralNet
-from binary.src.utils import load_data, split_data, one_hot_encode
-from binary.src.train import train, evaluate, predict_random_image
+from binary.src.utils import load_data, split_data
+from binary.src.train import train, evaluate, predict_random_image, predict_image_from_path
 import argparse
 
 def main(args):    
@@ -11,7 +11,10 @@ def main(args):
         if args.predict_random_image:
             predict_random_image(model, 'PetImages', ['Cat', 'Dog'], image_size=(64, 64))
             return
-
+        if args.predict_image:
+            predict_image_from_path(model, args.predict_image, ['Cat', 'Dog'])
+            return
+        
     data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True)
     
     # Split the data into training and testing sets
@@ -46,5 +49,6 @@ if __name__ == "__main__":
     parser.add_argument('--save-model', type=str, default='model.npz', help='Path to save the trained model')
     parser.add_argument('--load-model', type=str, default=None, help='Path to load a pre-trained model')
     parser.add_argument('--predict-random-image', action='store_true', help='Predict a random image from the dataset')
+    parser.add_argument('--predict-image', type=str, default=None, help='Path to image to predict')
     args = parser.parse_args()
     main(args)

@@ -92,3 +92,16 @@ def predict_random_image(model: BinaryNeuralNet, image_dir, labels, image_size=(
 
     print(f'Actual label: {folder}, Predicted label for {folder}{filename}: {predicted_label}')
     return predicted_label
+
+def predict_image_from_path(model: BinaryNeuralNet, file_path, labels, image_size=(64, 64)):
+    from PIL import Image
+
+    img = Image.open(file_path).convert('RGB')
+    img = img.resize(image_size)
+    img_array = np.array(img).flatten() / 255.0  # Normalize
+    img_array = img_array.reshape(1, -1)  # Reshape for prediction
+
+    prediction = model.predict(img_array)
+    predicted_label = labels[int(prediction[0][0])]
+    print(f'Predicted label: {predicted_label}')
+    return predicted_label
