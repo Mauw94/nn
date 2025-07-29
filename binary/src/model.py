@@ -1,4 +1,5 @@
 import numpy as np
+from shared.activation import sigmoid_activation, relu_derivative, relu
 
 # Neural Network Model for Binary Classification
 class BinaryNeuralNet:
@@ -18,42 +19,8 @@ class BinaryNeuralNet:
         self.biases = [np.zeros((1, layers[i+1]))for i in range(len(layers)-1)]
 
         print("nn initialized with layers: ", self.layers)
- 
-    # TODO: move activation/derivative functions to a separate file and use based on input
-    def sigmoid_activation(self, x):
-            x = np.clip(x, -500, 500)  # clip values to prevent overflow
-            return 1 / (1 + np.exp(-x))
-    
-    def sigmoid_derivative(self, X):
-        s = self.sigmoid_activation(X)
-        return s * (1 - s)
 
-    def relu(self, X):
-        return np.maximum(0, X)
-
-    def relu_derivative(self, X):
-        return (X > 0).astype(float)
-
-    # Good for avoiding 'dead' neurons in ReLU activations
-    def leaky_relu(self, X, alpha=0.01):
-        return np.where(X > 0, X, alpha * X)              
-
-    def leaky_relu_derivative(self, X, alpha=0.01):
-        return np.where(X > 0, 1, alpha)
-    
-    def tanh(self, x):
-        return np.tanh(x)
-    
-    def tanh_derivative(self, x):
-        t = self.tanh(x)
-        return 1 - t**2
-    
-    def softmax(x):
-        e_x = np.exp(x - np.max(x, axis=1, keepdims=True))
-        return e_x / np.sum(e_x, axis=1, keepdims=True)
-    
-    # Computes the output of the network for input X
-    # by passing it through the layers
+    # Computes the output of the network for input X by passing it through the layers
     def forward(self, X):
         self.a = [X] # activations
         self.z = [] # pre-activations
@@ -61,14 +28,13 @@ class BinaryNeuralNet:
             zi = np.dot(self.a[i], self.weights[i]) + self.biases[i]
             self.z.append(zi)
             if i == len(self.layers) - 2:  # last layer
-                ai = self.sigmoid_activation(zi) # sigmoid for binary classification
+                ai = sigmoid_activation(zi) # sigmoid for binary classification
             else:
-                ai = self.relu(zi) # use ReLU for hidden layers
+                ai = relu(zi) # use ReLU for hidden layers
             self.a.append(ai)
         return self.a, self.z
     
-    # Updates the weights and biases using backpropagation using gradient descent
-    # based on the error between predicted and actual output
+    # Updates the weights and biases using backpropagation using gradient descent based on the error between predicted and actual output
     def backward(self, X, y, learning_rate=0.01):
          assert self.a[-1].shape == y.shape, f"Shape mismatch: y_pred={self.a[-1].shape}, y={y.shape}"
          m = X.shape[0]
@@ -80,7 +46,7 @@ class BinaryNeuralNet:
             self.weights[i] -= learning_rate * grad_w
             self.biases[i] -= learning_rate * grad_b
             if i > 0:
-                delta = np.dot(delta, self.weights[i].T) * self.relu_derivative(self.z[i - 1])
+                delta = np.dot(delta, self.weights[i].T) * relu_derivative(self.z[i - 1])
 
     def predict_proba(self, X):
         a, _ = self.forward(X)
@@ -107,13 +73,3 @@ class BinaryNeuralNet:
         self.weights = [data[f"W{i}"] for i in range(num_layers)]
         self.biases  = [data[f"b{i}"] for i in range(num_layers)]
         print(f"Model loaded from {path} with weights and biases.")
-
-
-# When to use which activation function:
-# | Function   | Formula                                    | Derivative                               | Usage                    |
-# | ---------- | ------------------------------------------ | ---------------------------------------- | ------------------------ |
-# | Sigmoid    | $\frac{1}{1 + e^{-x}}$                     | $\sigma(x)(1 - \sigma(x))$               | Binary classification    |
-# | ReLU       | $\max(0, x)$                               | $1 \text{ if } x > 0 \text{ else } 0$    | Hidden layers            |
-# | Leaky ReLU | $x \text{ if } x>0 \text{ else } \alpha x$ | $1 \text{ if } x>0 \text{ else } \alpha$ | Hidden layers            |
-# | Tanh       | $\tanh(x)$                                 | $1 - \tanh^2(x)$                         | Hidden layers (older NN) |
-# | Softmax    | $\frac{e^{x_i}}{\sum e^{x_j}}$             | Complex (use `y_pred - y_true`)          | Output for multi-class   |
