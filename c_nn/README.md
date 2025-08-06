@@ -1,4 +1,3 @@
-````markdown
 # Convolutional Neural Network for Binary Image Classification
 
 This project implements a simple Convolutional Neural Network (CNN) from scratch using NumPy, intended for binary classification (e.g., Cats vs Dogs). The model is designed to work with RGB images of shape 64x64x3 and is trained using forward and backward propagation logic tailored to convolutional and fully connected layers.
@@ -138,5 +137,3 @@ Training on `PetImages` folder with two subfolders `Cat/` and `Dog/`, resized to
 Model learns to distinguish between cats and dogs using pixel-level and mid-level features via convolutions.
 
 ---
-
-```
