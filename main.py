@@ -30,7 +30,7 @@ def main(args):
     # data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=100, image_size=(64, 64), normalize_image=True, flatten=True)
 
     # Don't flatten the image for CNNBinaryClassifier
-    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True, flatten=False)
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=1000, image_size=(64, 64), normalize_image=True, flatten=False)
     
     # Split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_data(data, labels, seed=42)

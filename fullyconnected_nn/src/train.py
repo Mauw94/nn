@@ -1,4 +1,3 @@
-from binary.src.nn import NNBinaryClassifier
 import numpy as np
 import os
 
@@ -18,7 +17,7 @@ def train(model: BinaryNNInterface, X, y, epochs=100, learning_rate=0.01):
     for epoch in range(epochs):
         model.forward(X)
         model.backward(X, y, learning_rate)
-        if epoch % 100 == 0:
+        if epoch % 1 == 0:
             acc = accuracy(y, model.a[-1])
             loss = binary_cross_entropy(y, model.a[-1])
             preds = model.a[-1]
@@ -43,7 +42,7 @@ def accuracy(y_true, y_pred, threshold=0.5):
     preds = (y_pred > threshold).astype(int)
     return np.mean(preds == y_true)
 
-def evaluate(model: NNBinaryClassifier, X, y):
+def evaluate(model: BinaryNNInterface, X, y):
     """
     Evaluate the model's performance on the provided data.
     
@@ -63,7 +62,7 @@ def evaluate(model: NNBinaryClassifier, X, y):
     print(f'Accuracy: {acc * 100:.2f}%')
     return acc
 
-def predict_random_image(model: NNBinaryClassifier, image_dir, labels, image_size=(64, 64)):
+def predict_random_image(model: BinaryNNInterface, image_dir, labels, image_size=(64, 64)):
     """
     Predict the class of a random image from the specified directory.
     
@@ -95,7 +94,7 @@ def predict_random_image(model: NNBinaryClassifier, image_dir, labels, image_siz
     print(f'Actual label: {folder}, Predicted label for {folder}{filename}: {predicted_label}')
     return predicted_label
 
-def predict_image_from_path(model: NNBinaryClassifier, file_path, labels, image_size=(64, 64)):
+def predict_image_from_path(model: BinaryNNInterface, file_path, labels, image_size=(64, 64)):
     from PIL import Image
 
     img = Image.open(file_path).convert('RGB')
