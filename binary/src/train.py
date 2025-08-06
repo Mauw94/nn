@@ -1,8 +1,10 @@
-from binary.src.model import BinaryNeuralNet
+from binary.src.nn import BinaryNeuralNet
 import numpy as np
 import os
 
-def train(model: BinaryNeuralNet, X, y, epochs=100, learning_rate=0.01):
+from shared.nn_interface import NeuralNetInterface
+
+def train(model: NeuralNetInterface, X, y, epochs=100, learning_rate=0.01):
     """
     Train the neural network model using the provided data.
     

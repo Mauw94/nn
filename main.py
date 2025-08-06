@@ -1,10 +1,20 @@
-from binary.src.model import BinaryNeuralNet
+from binary.src.nn import BinaryNeuralNet
 from binary.src.utils import load_data, split_data
 from binary.src.train import train, evaluate, predict_random_image, predict_image_from_path
 import argparse
 
+from cnn.src.cnn import CNNBinaryClassifier
+
+def load_nn_binary_classifier(): 
+    return BinaryNeuralNet(layers=[64*64*3, 256, 128, 64, 1]) # 3 hidden layers(256, 128, 64)
+
+def load_cnn_binary_classifier():
+    return CNNBinaryClassifier(input_shape=(64, 64, 3), conv_filters=[(16, 3), (32, 3)], fc_sizes=[128, 1])
+
 def main(args):    
-    model = BinaryNeuralNet(layers=[64*64*3, 256, 128, 64, 1]) # 3 hidden layers(256, 128, 64)
+    # model = load_nn_binary_classifier()
+    model = load_cnn_binary_classifier()
+
     if args.load_model:
         model.load(args.load_model)
         print(f"Model loaded from {args.load_model}")
@@ -32,7 +42,7 @@ def main(args):
     # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
 
     if not args.load_model:
-        train(model, X_train, y_train, epochs=1000, learning_rate=0.001)
+        train(model, X_train, y_train, epochs=100, learning_rate=0.001)
         if args.save_model:
             model.save(args.save_model)\
     
