@@ -1,9 +1,9 @@
 import numpy as np
 from shared.activation import sigmoid_activation, relu_derivative, relu
-from shared.nn_interface import NeuralNetInterface
+from shared.nn_interface import BinaryNNInterface
 
 # Neural Network Model for Binary Classification
-class BinaryNeuralNet(NeuralNetInterface):
+class NNBinaryClassifier(BinaryNNInterface):
     def __init__(self, layers):
         # Example layers: [64*64*3, 128, 1]
         # where 64*64*3 is the input layer size (for 64x64 RGB images (*3 for RGB channels)),

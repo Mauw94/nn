@@ -1,4 +1,4 @@
-from binary.src.nn import BinaryNeuralNet
+from binary.src.nn import NNBinaryClassifier
 from binary.src.utils import load_data, split_data
 from binary.src.train import train, evaluate, predict_random_image, predict_image_from_path
 import argparse
@@ -6,14 +6,15 @@ import argparse
 from cnn.src.cnn import CNNBinaryClassifier
 
 def load_nn_binary_classifier(): 
-    return BinaryNeuralNet(layers=[64*64*3, 256, 128, 64, 1]) # 3 hidden layers(256, 128, 64)
+    return NNBinaryClassifier(layers=[64*64*3, 256, 128, 64, 1]) # 3 hidden layers(256, 128, 64)
 
 def load_cnn_binary_classifier():
     return CNNBinaryClassifier(input_shape=(64, 64, 3), conv_filters=[(16, 3), (32, 3)], fc_sizes=[128, 1])
 
 def main(args):    
     # model = load_nn_binary_classifier()
-    model = load_cnn_binary_classifier()
+    # NOTE: training the cnn binary classifier takes significantly longer than the 'normal' nn binary classifier
+    model = load_cnn_binary_classifier() 
 
     if args.load_model:
         model.load(args.load_model)
@@ -24,8 +25,12 @@ def main(args):
         if args.predict_image:
             predict_image_from_path(model, args.predict_image, ['Cat', 'Dog'])
             return
-        
-    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True)
+
+    # flatten and normalize image for BinaryNeuralNet
+    # data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=100, image_size=(64, 64), normalize_image=True, flatten=True)
+
+    # Don't flatten the image for CNNBinaryClassifier
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], image_size=(64, 64), normalize_image=True, flatten=False)
     
     # Split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_data(data, labels, seed=42)
@@ -40,7 +45,7 @@ def main(args):
     # print(y_train)
     # y_train = one_hot_encode(y_train, num_classes=2)
     # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
-
+    
     if not args.load_model:
         train(model, X_train, y_train, epochs=100, learning_rate=0.001)
         if args.save_model:
