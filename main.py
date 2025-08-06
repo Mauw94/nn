@@ -30,7 +30,7 @@ def main(args):
     # data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=100, image_size=(64, 64), normalize_image=True, flatten=True)
 
     # Don't flatten the image for CNNBinaryClassifier
-    data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=1000, image_size=(64, 64), normalize_image=True, flatten=False)
+    data, labels = load_data('PetImages', ['Cat', 'Dog'], max_images=200, image_size=(64, 64), normalize_image=True, flatten=False)
     
     # Split the data into training and testing sets
     X_train, y_train, X_test, y_test = split_data(data, labels, seed=42)
@@ -47,7 +47,7 @@ def main(args):
     # y_test = one_hot_encode(y_test, num_classes=2) => one-hot is for multi-class, not binary
     
     if not args.load_model:
-        train(model, X_train, y_train, epochs=100, learning_rate=0.001)
+        train(model, X_train, y_train, epochs=5, learning_rate=0.001)
         if args.save_model:
             model.save(args.save_model)\
     

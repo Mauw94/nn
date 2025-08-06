@@ -15,12 +15,11 @@ def train(model: BinaryNNInterface, X, y, epochs=100, learning_rate=0.01):
     - learning_rate: Step size for weight updates.
     """
     for epoch in range(epochs):
-        model.forward(X)
+        preds = model.forward(X)
         model.backward(X, y, learning_rate)
         if epoch % 1 == 0:
-            acc = accuracy(y, model.a[-1])
-            loss = binary_cross_entropy(y, model.a[-1])
-            preds = model.a[-1]
+            acc = accuracy(y, preds)
+            loss = binary_cross_entropy(y, preds)
             print(f'Epoch {epoch}, Loss: {loss}, Pred Mean: {preds.mean():.4f}, Min: {preds.min():.4f}, Max: {preds.max():.4f}, Acc: {acc}')
     
 def binary_cross_entropy(y_true, y_pred):

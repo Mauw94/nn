@@ -62,7 +62,7 @@ class CNNBinaryClassifier(BinaryNNInterface):
             self.fc_z.append(z)
             self.fc_a.append(a)
 
-        return self.a[-1]
+        return self.fc_a[-1]
 
     
     # We’re only doing backprop through the fully connected (dense) layers for now 
@@ -92,3 +92,13 @@ class CNNBinaryClassifier(BinaryNNInterface):
 
     def predict(self, X):
         return (self.predict_proba(X) > 0.5).astype(int)
+    
+    def save(self, path):
+        try:
+            data = {}
+            for i, (w, b) in enumerate(zip(self.fc_weights, self.fc_biases)):
+                data[f"W{i}"] = w
+                data[f"b{i}"] = b
+            np.savez(path, **data)
+        except Exception as e:
+            print(f"Couldn't save the model due to error: {e}")
