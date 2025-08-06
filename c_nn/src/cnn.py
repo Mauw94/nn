@@ -1,5 +1,5 @@
 import numpy as np
-from cnn.src.utils import conv2d, flatten, maxpool2d
+from c_nn.src.utils import conv2d, flatten, maxpool2d
 from shared.activation import sigmoid_activation, relu_derivative, relu
 from shared.nn_interface import BinaryNNInterface
 

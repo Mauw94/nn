@@ -1,9 +1,9 @@
-from binary.src.nn import NNBinaryClassifier
-from binary.src.utils import load_data, split_data
-from binary.src.train import train, evaluate, predict_random_image, predict_image_from_path
+from fullyconnected_nn.src.nn import NNBinaryClassifier
+from fullyconnected_nn.src.utils import load_data, split_data
+from fullyconnected_nn.src.train import train, evaluate, predict_random_image, predict_image_from_path
 import argparse
 
-from cnn.src.cnn import CNNBinaryClassifier
+from c_nn.src.cnn import CNNBinaryClassifier
 
 def load_nn_binary_classifier(): 
     return NNBinaryClassifier(layers=[64*64*3, 256, 128, 64, 1]) # 3 hidden layers(256, 128, 64)
