@@ -1,4 +1,3 @@
-````markdown
 # 🧠 Binary Neural Network (Feedforward) for Image Classification
 
 This project implements a **basic feedforward neural network** (fully connected) from scratch in NumPy, designed for **binary classification tasks**, such as distinguishing between **cats and dogs** in images.
